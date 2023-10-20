@@ -18,10 +18,13 @@ switch($accion){
     case 'a':
         if(isset($_GET["tipoCuenta"]) && isset($_GET["moneda"]) && isset($_GET["fecha"])){
             $depositos = cargarDepositosDesdeJSON('depositos.json');
+            
+            
             $deposito = Deposito::existeDeposito($depositos, $_GET["tipoCuenta"], $_GET["moneda"], $_GET["fecha"]);
 
             if($deposito !== null){
                 echo'<br>Mostrando el monto total de dicho dia...';
+                
                 $monto = Deposito::buscarMontosFecha($depositos, $_GET["fecha"]);
                 echo"<br>El monto total de todos los depositos de la fehca {$_GET["fecha"]} es de $monto";
             }else{
@@ -31,6 +34,8 @@ switch($accion){
             $fechaAnterior = date('Y-m-d', strtotime('-1 day'));
             $depositos = cargarDepositosDesdeJSON('depositos.json');
             $deposito = Deposito::existeDeposito($depositos, $_GET["tipoCuenta"], $_GET["moneda"]);
+            $fecha = $_GET["fecha"];
+            echo"<br>{$fecha}";
             if($deposito !== null){
                 echo'<br>Mostrando depositos de dicho dia...';
                 if(Deposito::mostrarDepositosConFecha($depositos, $fechaAnterior)){

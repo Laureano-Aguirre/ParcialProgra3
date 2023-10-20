@@ -71,7 +71,7 @@ class Deposito implements JsonSerializable{
         if($depositos){
             foreach($depositos as $deposito){
                 if($deposito->fecha == $fecha){
-                    $monto += $deposito->monto;
+                    $monto += $deposito->importe;
                 }
             }
             return $monto;
