@@ -1,0 +1,13 @@
+[
+    {
+        "id": 100001,
+        "nombre": "Laureano",
+        "apellido": "Aguirre",
+        "tipoDocumento": "dni",
+        "nroDocumento": "11222333",
+        "email": "laureano@gmail.com",
+        "tipoCuenta": "CA",
+        "moneda": "$",
+        "saldoInicial": 8000
+    }
+]

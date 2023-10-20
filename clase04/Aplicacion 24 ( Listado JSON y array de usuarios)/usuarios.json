@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "nombre": "Nombre1",
+        "clave": "Clave1",
+        "mail": "correo1@example.com",
+        "fecha": "2023-10-02"
+    },
+    {
+        "id": 2,
+        "nombre": "Nombre2",
+        "clave": "Clave2",
+        "mail": "correo2@example.com",
+        "fecha": "2023-10-03"
+    }
+]

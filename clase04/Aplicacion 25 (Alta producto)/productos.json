@@ -1,0 +1,18 @@
+[
+    {
+        "id": "1",
+        "codigoBarras": "222222",
+        "nombre": "coca cola",
+        "tipo": "bebida",
+        "stock": "3",
+        "precio": "500"
+    },
+    {
+        "id": "2",
+        "codigoBarras": "111111",
+        "nombre": "carne",
+        "tipo": "comida",
+        "stock": 15,
+        "precio": "5000"
+    }
+]

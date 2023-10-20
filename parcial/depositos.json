@@ -1,0 +1,10 @@
+[
+    {
+        "id": 101,
+        "tipoCuenta": "CA",
+        "nroCuenta": "100001",
+        "moneda": "$",
+        "importe": "2000",
+        "fecha": "2023-10-19"
+    }
+]
