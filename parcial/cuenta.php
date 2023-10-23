@@ -111,6 +111,20 @@ class Cuenta implements JsonSerializable
         }
     }
 
+    public static function actualizarCuentas($cuentas, $cuentaModificada, $idCuenta){
+        if($cuentas){
+            foreach($cuentas as $key => $cuenta){       //iteramos por indice numerico del array
+                if($cuenta->id = $idCuenta){
+                    $cuentas[$key] = $cuentaModificada; //reemplazamos en el indice que coinciden los id, un objeto por otro
+                    return $cuentas;
+                }
+            }
+        }else{
+            echo'<br>Array vacio en actualizar cuentas';
+        }
+        return $cuentas;
+    }
+
     public static function retornarCuenta($cuentas, $nombreCuenta, $tipoCuenta){
         if($cuentas){
             foreach($cuentas as $cuenta){
@@ -124,10 +138,10 @@ class Cuenta implements JsonSerializable
         return null;
     }
 
-    public static function buscarCuentaPorNro($cuentas, $numeroCuenta){
+    public static function buscarCuentaPorNro($cuentas, $numeroCuenta, $tipoCuenta = null){
         if($cuentas){
             foreach($cuentas as $cuenta){
-                if($numeroCuenta == $cuenta->id){
+                if(($numeroCuenta == $cuenta->id && $tipoCuenta == $cuenta->tipoCuenta) || $numeroCuenta == $cuenta->id){
                     return $cuenta;
                 }
             }
@@ -135,5 +149,16 @@ class Cuenta implements JsonSerializable
             echo'<br>Array vacio...';
         }
         return null;
+    }
+
+    public function modificarCuenta($nombre, $apellido, $tipoDocumento, $nroDocumento, $email, $moneda){
+        $this->nombre = $nombre;
+        $this->apellido = $apellido;
+        $this->tipoDocumento = $tipoDocumento;
+        $this->nroDocumento = $nroDocumento;
+        $this->email = $email;
+        $this->moneda = $moneda;
+
+        return true;
     }
 }
