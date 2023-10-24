@@ -1,6 +1,6 @@
 [
     {
-        "id": 100001,
+        "id": "100001",
         "nombre": "Pepe",
         "apellido": "Gomez",
         "tipoDocumento": "dni",
@@ -8,19 +8,7 @@
         "email": "pepe@gmail.com",
         "tipoCuenta": "CC",
         "moneda": "$",
-        "saldoInicial": "50000",
-        "estado": "-1"
-    },
-    {
-        "id": 100002,
-        "nombre": "Laureano",
-        "apellido": "Aguirre",
-        "tipoDocumento": "dni",
-        "nroDocumento": "43031459",
-        "email": "laureano@gmail.com",
-        "tipoCuenta": "CA",
-        "moneda": "$$",
-        "saldoInicial": "10000",
+        "saldoInicial": 49500,
         "estado": "-1"
     }
 ]

@@ -100,5 +100,11 @@
         "idMovimiento": "13",
         "motivo": "retiro erroneo",
         "importe": "5000"
+    },
+    {
+        "id": 1018,
+        "idMovimiento": "14",
+        "motivo": "retiro erroneo",
+        "importe": "500"
     }
 ]

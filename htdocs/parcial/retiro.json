@@ -22,5 +22,13 @@
         "moneda": "$",
         "importe": "10000",
         "fecha": "2023-10-23"
+    },
+    {
+        "id": 14,
+        "tipoCuenta": "Cc",
+        "nroCuenta": "100001",
+        "moneda": "$",
+        "importe": "1000",
+        "fecha": "2023-10-24"
     }
 ]
