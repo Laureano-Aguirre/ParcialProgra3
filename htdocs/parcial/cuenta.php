@@ -82,20 +82,21 @@ class Cuenta implements JsonSerializable
         return $this->estado;
     }
 
-    public function setId($nuevoId) {
-        $this->id= $nuevoId;
+    public function setId($nuevoId)
+    {
+        $this->id = $nuevoId;
     }
 
 
     public static function existeCuenta($cuentas, $nombreCuenta, $tipoCuenta)
-    {        
+    {
         if ($cuentas) {
-            foreach($cuentas as $cuenta){
-                if($cuenta->nombre === $nombreCuenta && $cuenta->tipoCuenta === $tipoCuenta){
+            foreach ($cuentas as $cuenta) {
+                if ($cuenta->nombre === $nombreCuenta && $cuenta->tipoCuenta === $tipoCuenta) {
                     return 1;       //coincide ambas
-                }elseif($cuenta->nombre === $nombreCuenta && $cuenta->tipoCuenta !== $tipoCuenta){
+                } elseif ($cuenta->nombre === $nombreCuenta && $cuenta->tipoCuenta !== $tipoCuenta) {
                     return 2;       //coincide solo el nombre
-                }elseif($cuenta->tipoCuenta === $tipoCuenta && $cuenta->nombre !== $nombreCuenta){
+                } elseif ($cuenta->tipoCuenta === $tipoCuenta && $cuenta->nombre !== $nombreCuenta) {
                     return 3;       //coincide solo tipo de cuenta
                 }
             }
@@ -105,61 +106,66 @@ class Cuenta implements JsonSerializable
         return 0;
     }
 
-    public static function actualizarSaldo($cuentas, $nombreCuenta, $tipoCuenta, $saldo){
-        if($cuentas){
-            foreach($cuentas as $cuenta){
-                if($cuenta->nombre === $nombreCuenta && $cuenta->tipoCuenta === $tipoCuenta){
+    public static function actualizarSaldo($cuentas, $nombreCuenta, $tipoCuenta, $saldo)
+    {
+        if ($cuentas) {
+            foreach ($cuentas as $cuenta) {
+                if ($cuenta->nombre === $nombreCuenta && $cuenta->tipoCuenta === $tipoCuenta) {
                     $cuenta->saldoInicial =  $cuenta->saldoInicial + $saldo;
                     return $cuentas;
                 }
             }
-        }else{
-            echo'<br>Array vacio...';
+        } else {
+            echo '<br>Array vacio...';
             return false;
         }
     }
 
-    public static function actualizarCuentas($cuentas, $cuentaModificada, $idCuenta){
-        if($cuentas){
-            foreach($cuentas as $key => $cuenta){       //iteramos por indice numerico del array
-                if($cuenta->id = $idCuenta){
+    public static function actualizarCuentas($cuentas, $cuentaModificada, $idCuenta)
+    {
+        if ($cuentas) {
+            foreach ($cuentas as $key => $cuenta) {       //iteramos por indice numerico del array
+                if ($cuenta->id = $idCuenta) {
                     $cuentas[$key] = $cuentaModificada; //reemplazamos en el indice que coinciden los id, un objeto por otro
                     return $cuentas;
                 }
             }
-        }else{
-            echo'<br>Array vacio en actualizar cuentas';
+        } else {
+            echo '<br>Array vacio en actualizar cuentas';
         }
         return $cuentas;
     }
 
-    public static function retornarCuenta($cuentas, $nombreCuenta, $tipoCuenta){
-        if($cuentas){
-            foreach($cuentas as $cuenta){
-                if($cuenta->nombre === $nombreCuenta && $cuenta->tipoCuenta === $tipoCuenta){
+    public static function retornarCuenta($cuentas, $nombreCuenta, $tipoCuenta)
+    {
+        if ($cuentas) {
+            foreach ($cuentas as $cuenta) {
+                if ($cuenta->nombre === $nombreCuenta && $cuenta->tipoCuenta === $tipoCuenta) {
                     return $cuenta;
                 }
             }
-        }else{
-            echo'<br>Array vacio...';
+        } else {
+            echo '<br>Array vacio...';
         }
         return null;
     }
 
-    public static function buscarCuentaPorNro($cuentas, $numeroCuenta, $tipoCuenta = null){
-        if($cuentas){
-            foreach($cuentas as $cuenta){
-                if(($numeroCuenta == $cuenta->id && $tipoCuenta == $cuenta->tipoCuenta) || $numeroCuenta == $cuenta->id){
+    public static function buscarCuentaPorNro($cuentas, $numeroCuenta, $tipoCuenta = null)
+    {
+        if ($cuentas) {
+            foreach ($cuentas as $cuenta) {
+                if (($numeroCuenta == $cuenta->id && $tipoCuenta == $cuenta->tipoCuenta) || $numeroCuenta == $cuenta->id) {
                     return $cuenta;
                 }
             }
-        }else{
-            echo'<br>Array vacio...';
+        } else {
+            echo '<br>Array vacio...';
         }
         return null;
     }
 
-    public static function modificarCuenta($cuenta, $nombre, $apellido, $tipoDocumento, $nroDocumento, $email, $moneda){
+    public static function modificarCuenta($cuenta, $nombre, $apellido, $tipoDocumento, $nroDocumento, $email, $moneda)
+    {
         $cuenta->nombre = $nombre;
         $cuenta->apellido = $apellido;
         $cuenta->tipoDocumento = $tipoDocumento;
@@ -170,52 +176,50 @@ class Cuenta implements JsonSerializable
         return true;
     }
 
-    public static function retiro($cuenta, $importe){
+    public static function retiro($cuenta, $importe)
+    {
         $resultado = $cuenta->saldoInicial = $cuenta->saldoInicial - $importe;
-        if($resultado >=0){
+        if ($resultado >= 0) {
             return $cuenta;
         }
         return null;
     }
 
-    public static function ajustarSaldoDeposito($cuenta, $deposito, $ajuste){
+    public static function ajustarSaldoDeposito($cuenta, $deposito, $ajuste)
+    {
         $resultado = $deposito - $ajuste;
         $cuenta->saldoInicial = $cuenta->saldoInicial - $resultado;
         return $cuenta;
     }
 
-    public static function ajustarSaldoRetiro($cuenta, $importeOperacion, $ajuste){
+    public static function ajustarSaldoRetiro($cuenta, $importeOperacion, $ajuste)
+    {
         $resultado = $importeOperacion - $ajuste;
         $cuenta->saldoInicial = $cuenta->saldoInicial + $resultado;
         return $cuenta;
     }
 
-    public static function cambiarEstado($cuentas, $cuenta, $estado){
-        
-        $cuentasActualizadas = $cuentas;
-        foreach($cuentasActualizadas as $cuentaAux){
-            if($cuentaAux->id == $cuenta->id){
-                if($estado == -1 || $estado == 1){
-                    $cuentaAux->estado = $estado;
-                    return $cuentasActualizadas;
-                }
-            }
+    public function cambiarEstado($estado)
+    {
+        if ($estado == -1 || $estado == 1) {
+            $this->estado = $estado;
+            return true;
         }
-        
-        return null;
     }
 
-    public static function validarTipoCuenta($cuentas, $tipoCuenta, $nroDocumento){
-        if($cuentas){
-            foreach($cuentas as $cuenta){
-                if($cuenta->tipoCuenta == $tipoCuenta && $cuenta->nroDocumento == $nroDocumento){
+
+
+    public static function validarTipoCuenta($cuentas, $tipoCuenta, $nroDocumento)
+    {
+        if ($cuentas) {
+            foreach ($cuentas as $cuenta) {
+                if ($cuenta->tipoCuenta == $tipoCuenta && $cuenta->nroDocumento == $nroDocumento) {
                     return true;
                 }
             }
-        }else{
-            echo'<br>Array de cuentas vacio en validarTipoCuenta';
+        } else {
+            echo '<br>Array de cuentas vacio en validarTipoCuenta';
         }
         return false;
     }
-
 }

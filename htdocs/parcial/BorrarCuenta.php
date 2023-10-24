@@ -6,7 +6,7 @@ y debe realizar la baja de la cuenta (soft-delete, no físicamente) y la foto re
 esa venta debe moverse a la carpeta /ImagenesBackupCuentas/2023.
 */
 
-include_once 'cuenta.php';
+require_once 'cuenta.php';
 
 parse_str(file_get_contents("php://input"), $request);
 
@@ -23,9 +23,10 @@ if(isset($request['estado']) && isset($request['tipoCuenta']) && isset($request[
         if($cuenta !== null){
             echo'<br>Encontramos la cuenta, procedemos a borrarla...';
             if($estado == -1){   //-1 inactiva, 1 activa
-                $cuentasActualizadas = Cuenta::cambiarEstado($cuentas, $cuenta, $estado);
-                if($cuentasActualizadas !== null){
-                    echo'<br>Exito al borrar la cuenta...';      
+                $retorno = $cuenta->cambiarEstado($estado);
+                if($retorno){
+                    echo'<br>Exito al cambiar de estado la cuenta...';
+                    $cuentasActualizadas = Cuenta::actualizarCuentas($cuentas, $cuenta, $cuenta->getId());
                     if(actualizarJSON($cuentasActualizadas))  {
                         echo'<br>Exito al actualizar el json...';
                     }   
@@ -42,9 +43,10 @@ if(isset($request['estado']) && isset($request['tipoCuenta']) && isset($request[
                     echo'<br>Error al cambiar su estado, intente mas tarde...';
                 }
             }elseif($estado == 1 ) {
-                $cuentasActualizadas = Cuenta::cambiarEstado($cuentas, $cuenta, $estado);
-                if($cuentasActualizadas !== null){
-                    echo'<br>Exito al reestablecer la cuenta...';        
+                $retorno = $cuenta->cambiarEstado($estado);
+                if($retorno){
+                    echo'<br>Exito al reestablecer la cuenta...';
+                    $cuentasActualizadas = Cuenta::actualizarCuentas($cuentas, $cuenta, $cuenta->getId());
                     if(actualizarJSON($cuentasActualizadas))  {
                         echo'<br>Exito al actualizar el json...';
                     }   
