@@ -16,58 +16,74 @@ Tipo de Cuenta (ej.: NNNNNNTT) como identificación en la carpeta:
 
 include "cuenta.php";
 
-if (isset($_POST["nombre"]) && isset($_POST["apellido"]) && isset($_POST["tipoDocumento"]) && isset($_POST["nroDocumento"]) && isset($_POST["email"]) && isset($_POST["tipoCuenta"]) && isset($_POST["moneda"]) && isset($_POST["saldoInicial"]) && isset($_FILES["archivo"])){
+if (isset($_POST["nombre"]) && isset($_POST["apellido"]) && isset($_POST["tipoDocumento"]) && isset($_POST["nroDocumento"]) && isset($_POST["email"]) && isset($_POST["tipoCuenta"]) && isset($_POST["moneda"]) && isset($_POST["estado"]) && isset($_FILES["archivo"])){
 
     $nombre = $_POST["nombre"];
     $tipoCuenta = $_POST["tipoCuenta"];
+    
     $cuentas = cargarCuentasDesdeJSON("banco.json");
-
+    $saldoInicial = isset($_POST["saldoInicial"]) && !empty($_POST["saldoInicial"]) ? $_POST["saldoInicial"] : 0 ;
 
     if(Cuenta::existeCuenta($cuentas, $nombre, $tipoCuenta) !== 1){
-
-        $id = generarIDAutoincremental();
-        $cuenta = new Cuenta($id, $nombre, $_POST["apellido"], $_POST["tipoDocumento"], $_POST["nroDocumento"], $_POST["email"], $tipoCuenta, $_POST["moneda"], $_POST["saldoInicial"]);
-        $archivo = $_FILES['archivo'];
-        $nombreImagen = $archivo['name'];
-        $tipo = $archivo['type'];
-        if(escribirEnJSON($cuenta, $cuentas)){
-            echo'<br> La cuenta ha sido creada correctamente.';
-            $nombreImagen = generarNombreImagen($tipoCuenta, $id);
-            move_uploaded_file($archivo['tmp_name'], 'Imagenes/2023/' . $nombreImagen);
+        if(!Cuenta::validarTipoCuenta($cuentas, $tipoCuenta, $_POST["nroDocumento"])){
             
-        }else{
+            if($saldoInicial >= 0){
+            $id = generarIDAutoincremental($cuentas);
+            $cuenta = new Cuenta($id, $nombre, $_POST["apellido"], $_POST["tipoDocumento"], $_POST["nroDocumento"], $_POST["email"], $tipoCuenta, $_POST["moneda"], $saldoInicial, $_POST["estado"]);
+            $archivo = $_FILES['archivo'];
+            $nombreImagen = $archivo['name'];
+            $tipo = $archivo['type'];
+            if(escribirEnJSON($cuenta, $cuentas)){
+                echo'<br> La cuenta ha sido creada correctamente.';
+                $nombreImagen = generarNombreImagen($tipoCuenta, $id);
+                move_uploaded_file($archivo['tmp_name'], 'Imagenes/2023/' . $nombreImagen);
+            }else{
             echo'<br>Error al crear la cuenta...';
+            }
+        }else{
+            echo'<br>Error el saldo debe ser mayor a 0...';
         }
-
+        }else{
+            echo'<br>Ya posee una cuenta de ese tipo, por favor, ingrese otro tipo de cuenta...';
+        }    
     }else{
         echo'<br>La cuenta ya existe, actualizaremos el saldo...';
-        echo"<br>{$_POST["saldoInicial"]}";
-        $cuentasActualizada = Cuenta::actualizarSaldo($cuentas, $nombre, $tipoCuenta, $_POST["saldoInicial"]);
-        if(actualizarJSON($cuentasActualizada, $tipoCuenta, $nombre, $_POST["saldoInicial"])){
+        $cuentasActualizada = Cuenta::actualizarSaldo($cuentas, $nombre, $tipoCuenta, $saldoInicial);
+        if(actualizarJSON($cuentasActualizada, $tipoCuenta, $nombre, $saldoInicial)){
             echo'<br>Exito al actualizar la cuenta...';
         }else{
             echo'<br>No se pudo actualizar la cuenta...';
         }
     }
-}else{
+}
+else{
     echo'<br>Parametros incorrectos';
 }
 
 function cargarCuentasDesdeJSON($archivo){
-
-    // leo el contenido
     $contenidoJSON = file_get_contents($archivo);
+    $datos = json_decode($contenidoJSON, true);
 
-    // lo decodifico
-    $cuentas = json_decode($contenidoJSON, false);
-
-    // confirmo que este cargado el array
-    if (is_array($cuentas)) {
-        echo '<br>Decodificacion exitosa...';
-        return $cuentas;
-    } else {
-        echo "<br>Error al decodificar el archivo JSON.";
+    $cuentas = [];
+    if($datos){
+        foreach ($datos as $dato) {
+            $cuentas[] = new Cuenta(
+                $dato['id'],
+                $dato['nombre'],
+                $dato['apellido'],
+                $dato['tipoDocumento'],
+                $dato['nroDocumento'],
+                $dato['email'],
+                $dato['tipoCuenta'],
+                $dato['moneda'],
+                $dato['saldoInicial'],
+                $dato['estado']
+            );
+        }
     }
+    
+
+    return $cuentas;
 }
 
 function escribirEnJson($cuenta, $cuentas){
@@ -106,16 +122,12 @@ function actualizarJSON($cuentasActualizadas){
 
 }
 
-function generarIDAutoincremental() {
-
-    $contenidoJSON = file_get_contents("banco.json");   //lee el contenido del archivo
-
-    $cuentas = json_decode($contenidoJSON);   //lo decodifica
+function generarIDAutoincremental($cuentas){
 
     $id = 100000;
     foreach ($cuentas as $cuenta) {
-        if ($cuenta->id > $id) {
-            $id = $cuenta->id;    //busca el ultimo id
+        if ($cuenta->getId() > $id) {
+            $id = $cuenta->getId();    //busca el ultimo id
         }
     }
 

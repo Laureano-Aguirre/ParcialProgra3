@@ -17,8 +17,8 @@ if(isset($_POST["tipoCuenta"]) && isset($_POST["nroCuenta"]) && isset($_POST["mo
     $tipoCuenta = $_POST["tipoCuenta"];
     $nroCuenta = $_POST["nroCuenta"];
     
-    $cuentas = cargarCuentasDesdeJSONBanco("banco.json");
-    echo"<br>$nroCuenta";
+    
+    $cuentas = cargarCuentasDesdeJSON("banco.json");
     
     $cuenta = Cuenta::buscarCuentaPorNro($cuentas, $nroCuenta);
     
@@ -26,21 +26,25 @@ if(isset($_POST["tipoCuenta"]) && isset($_POST["nroCuenta"]) && isset($_POST["mo
         $archivo = $_FILES['archivo'];
         $nombreImagen = $archivo['name'];
         $tipo = $archivo['type'];
-        //actualizar saldo y crear deposito y luego escribir en json
-        $cuentasActualizado = Cuenta::actualizarSaldo($cuentas, $cuenta->nombre, $tipoCuenta, $_POST["importe"]);
+
+        echo'<br>Ya encontramos la cuenta, aguarde que estamos realizando la operacion...';
+
+        $cuentasActualizado = Cuenta::actualizarSaldo($cuentas, $cuenta->getNombre(), $tipoCuenta, $_POST["importe"]);
         if(actualizarJSONBanco($cuentasActualizado)){
             echo'<br>Saldo actualizado correctamente...';
             $fechaActual = date("Y-m-d");
-            $id = generarIdAutoIncremental();
-            $deposito = new Deposito($id, $tipoCuenta, $nroCuenta, $_POST["moneda"], $_POST["importe"], $fechaActual);
             $depositos = cargarDepositosDesdeJSON('depositos.json');
+            $id = generarIdAutoIncremental($depositos);
+            $deposito = new Deposito($id, $tipoCuenta, $nroCuenta, $_POST["moneda"], $_POST["importe"], $fechaActual);
             if(escribirEnJsonDepositos($deposito, $depositos)){
-                $nombreImagen = generarNombreImagen($tipoCuenta, $cuenta->id, $id);
+                $nombreImagen = generarNombreImagen($tipoCuenta, $cuenta->getId(), $id);
                 move_uploaded_file($archivo['tmp_name'], 'ImagenesDeDepositos2023/' . $nombreImagen);
                 echo'<br> El deposito se realizo con exito.';
             }else{
                 echo'<br>Error al guardar el deposito...';
             }
+        }else{
+            echo'<br>Error al acutalizar el banco.json...';
         }
     }else{
         echo'<br>La cuenta no existe...';
@@ -49,21 +53,27 @@ if(isset($_POST["tipoCuenta"]) && isset($_POST["nroCuenta"]) && isset($_POST["mo
     echo'<br>Parametros incorrectos';
 }
 
-function cargarCuentasDesdeJSONBanco($archivo){
-
-    // leo el contenido
+function cargarCuentasDesdeJSON($archivo){
     $contenidoJSON = file_get_contents($archivo);
+    $datos = json_decode($contenidoJSON, true);
 
-    // lo decodifico
-    $cuentas = json_decode($contenidoJSON, false);
-
-    // confirmo que este cargado el array
-    if (is_array($cuentas)) {
-        echo '<br>Decodificacion exitosa...';
-        return $cuentas;
-    } else {
-        echo "<br>Error al decodificar el archivo JSON.";
+    $cuentas = [];
+    foreach ($datos as $dato) {
+        $cuentas[] = new Cuenta(
+            $dato['id'],
+            $dato['nombre'],
+            $dato['apellido'],
+            $dato['tipoDocumento'],
+            $dato['nroDocumento'],
+            $dato['email'],
+            $dato['tipoCuenta'],
+            $dato['moneda'],
+            $dato['saldoInicial'],
+            $dato['estado']
+        );
     }
+
+    return $cuentas;
 }
 
 function actualizarJSONBanco($cuentasActualizadas){
@@ -84,20 +94,22 @@ function actualizarJSONBanco($cuentasActualizadas){
 }
 
 function cargarDepositosDesdeJSON($archivo){
-
-    // leo el contenido
     $contenidoJSON = file_get_contents($archivo);
+    $datos = json_decode($contenidoJSON, true);
 
-    // lo decodifico
-    $depositos = json_decode($contenidoJSON, false);
-
-    // confirmo que este cargado el array
-    if (is_array($depositos)) {
-        echo '<br>Decodificacion exitosa...';
-        return $depositos;
-    } else {
-        echo "<br>Error al decodificar el archivo JSON.";
+    $depositos = [];
+    foreach ($datos as $dato) {
+        $depositos[] = new Deposito(
+            $dato['id'],
+            $dato['tipoCuenta'],
+            $dato['nroCuenta'],
+            $dato['moneda'],
+            $dato['importe'],
+            $dato['fecha']
+        );
     }
+
+    return $depositos;
 }
 
 function escribirEnJsonDepositos($deposito, $depositos){
@@ -119,16 +131,12 @@ function escribirEnJsonDepositos($deposito, $depositos){
     }
 }
 
-function generarIDAutoincremental() {
-
-    $contenidoJSON = file_get_contents("depositos.json");   //lee el contenido del archivo
-
-    $depositos = json_decode($contenidoJSON);   //lo decodifica
+function generarIDAutoincremental($depositos) {
 
     $id = 100;
     foreach ($depositos as $deposito) {
-        if ($deposito->id > $id) {
-            $id = $deposito->id;    //busca el ultimo id
+        if ($deposito->getId() > $id) {
+            $id = $deposito->getId();    //busca el ultimo id
         }
     }
 

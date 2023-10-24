@@ -1,0 +1,23 @@
+-- 1) SELECT * FROM usuario ORDER BY apellido ASC
+-- 2) SELECT * FROM producto WHERE producto.tipo = 'liquido';
+-- 3) SELECT * FROM venta WHERE cantidad >= 6 and cantidad <= 10;
+-- 4) SELECT SUM(cantidad) AS total_cantidades from venta;
+/*6) SELECT U.nombre AS NombreUsuario, P.nombre AS NombreProducto
+FROM Venta V
+JOIN Usuario U ON V.id_usuario = U.id
+JOIN Producto P ON V.id_producto = P.id;*/
+/*7) SELECT ROUND(v.cantidad * p.precio, 2) AS monto
+FROM venta v 
+JOIN producto p ON v.id_producto = p.id*/
+/*8) SELECT SUM(v.cantidad) AS cantidad
+FROM venta v
+WHERE v.id_producto = 1003 AND v.id_usuario = 104*/
+
+/*9) SELECT p.codigo_de_barra AS codigo_de_barras
+FROM Venta v
+JOIN Producto p ON v.id_producto = p.id
+JOIN Usuario u ON v.id_usuario = u.id
+WHERE u.localidad = 'Avellaneda';*/
+
+/*10) SELECT * FROM usuario
+WHERE nombre LIKE '%u%';*/

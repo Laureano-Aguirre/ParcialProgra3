@@ -24,6 +24,10 @@ class Deposito implements JsonSerializable{
         $this->fecha = $fecha;
     }
 
+    public function getId() {
+        return $this->id;
+    }
+
     public function getTipoCuenta() {
         return $this->tipoCuenta;
     }
@@ -147,7 +151,7 @@ class Deposito implements JsonSerializable{
                     echo"<br>Numero de cuenta: $deposito->nroCuenta";
                     echo"<br>Moneda: $deposito->moneda";
                     echo"<br>Importe: $deposito->importe";
-                    echo"<br>Fecha: $deposito->fecha";
+                    echo"<br>Fecha: $deposito->fecha<br>";
                 }                
             }
             return true;
@@ -167,7 +171,7 @@ class Deposito implements JsonSerializable{
                 echo "<br>Numero de cuenta: $deposito->nroCuenta";
                 echo "<br>Moneda: $deposito->moneda";
                 echo "<br>Importe: $deposito->importe";
-                echo "<br>Fecha: $deposito->fecha";
+                echo "<br>Fecha: $deposito->fecha<br>";
             }
             return true;
         } else {
@@ -176,6 +180,29 @@ class Deposito implements JsonSerializable{
         return false;
     }
 
+    public static function buscarDepositoId($id, $depositos){
+        if ($depositos){
+            foreach($depositos as $deposito){
+                if($deposito->id == $id){
+                    return $deposito;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static function modificarDeposito($deposito, $montoActualizado){
+        $deposito->importe = $montoActualizado;
+        return $deposito;
+    }
+
+    public static function retornarNroCuentaIdDeposito($deposito){
+        return $deposito->nroCuenta;
+    }
+
+    public static function retornarMonto($deposito){
+        return $deposito->importe;
+    }
     /*public static function mostrarDepositos($depositos, $fecha = null){
         if($depositos){
             echo '<br>Depósitos: ';

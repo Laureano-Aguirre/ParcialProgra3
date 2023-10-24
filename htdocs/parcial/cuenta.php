@@ -11,8 +11,9 @@ class Cuenta implements JsonSerializable
     private $tipoCuenta;
     private $moneda;
     private $saldoInicial;
+    private $estado;
 
-    public function __construct($id, $nombre, $apellido, $tipoDocumento, $nroDocumento, $email, $tipoCuenta, $moneda, $saldoInicial)
+    public function __construct($id, $nombre, $apellido, $tipoDocumento, $nroDocumento, $email, $tipoCuenta, $moneda, $saldoInicial, $estado = null)
     {
         $this->id = $id;
         $this->nombre = $nombre;
@@ -23,6 +24,7 @@ class Cuenta implements JsonSerializable
         $this->tipoCuenta = $tipoCuenta;
         $this->moneda = $moneda;
         $this->saldoInicial = $saldoInicial;
+        $this->estado = $estado;
     }
 
     public function jsonSerialize()
@@ -75,9 +77,15 @@ class Cuenta implements JsonSerializable
         return $this->saldoInicial;
     }
 
+    public function getEstado()
+    {
+        return $this->estado;
+    }
+
     public function setId($nuevoId) {
         $this->id= $nuevoId;
     }
+
 
     public static function existeCuenta($cuentas, $nombreCuenta, $tipoCuenta)
     {        
@@ -92,7 +100,7 @@ class Cuenta implements JsonSerializable
                 }
             }
         } else {
-            echo "<br>Archivo vacio...";
+            echo "<br>Archivo vacio en existe cuenta...";
         }
         return 0;
     }
@@ -151,14 +159,63 @@ class Cuenta implements JsonSerializable
         return null;
     }
 
-    public function modificarCuenta($nombre, $apellido, $tipoDocumento, $nroDocumento, $email, $moneda){
-        $this->nombre = $nombre;
-        $this->apellido = $apellido;
-        $this->tipoDocumento = $tipoDocumento;
-        $this->nroDocumento = $nroDocumento;
-        $this->email = $email;
-        $this->moneda = $moneda;
+    public static function modificarCuenta($cuenta, $nombre, $apellido, $tipoDocumento, $nroDocumento, $email, $moneda){
+        $cuenta->nombre = $nombre;
+        $cuenta->apellido = $apellido;
+        $cuenta->tipoDocumento = $tipoDocumento;
+        $cuenta->nroDocumento = $nroDocumento;
+        $cuenta->email = $email;
+        $cuenta->moneda = $moneda;
 
         return true;
     }
+
+    public static function retiro($cuenta, $importe){
+        $resultado = $cuenta->saldoInicial = $cuenta->saldoInicial - $importe;
+        if($resultado >=0){
+            return $cuenta;
+        }
+        return null;
+    }
+
+    public static function ajustarSaldoDeposito($cuenta, $deposito, $ajuste){
+        $resultado = $deposito - $ajuste;
+        $cuenta->saldoInicial = $cuenta->saldoInicial - $resultado;
+        return $cuenta;
+    }
+
+    public static function ajustarSaldoRetiro($cuenta, $importeOperacion, $ajuste){
+        $resultado = $importeOperacion - $ajuste;
+        $cuenta->saldoInicial = $cuenta->saldoInicial + $resultado;
+        return $cuenta;
+    }
+
+    public static function cambiarEstado($cuentas, $cuenta, $estado){
+        
+        $cuentasActualizadas = $cuentas;
+        foreach($cuentasActualizadas as $cuentaAux){
+            if($cuentaAux->id == $cuenta->id){
+                if($estado == -1 || $estado == 1){
+                    $cuentaAux->estado = $estado;
+                    return $cuentasActualizadas;
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    public static function validarTipoCuenta($cuentas, $tipoCuenta, $nroDocumento){
+        if($cuentas){
+            foreach($cuentas as $cuenta){
+                if($cuenta->tipoCuenta == $tipoCuenta && $cuenta->nroDocumento == $nroDocumento){
+                    return true;
+                }
+            }
+        }else{
+            echo'<br>Array de cuentas vacio en validarTipoCuenta';
+        }
+        return false;
+    }
+
 }

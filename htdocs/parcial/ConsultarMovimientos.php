@@ -8,9 +8,16 @@ c- El listado de depósitos entre dos fechas ordenado por nombre.
 d- El listado de depósitos por tipo de cuenta.
 e- El listado de depósitos por moneda.
 */
+/*
+2DA PARTE:
+ConsultaMovimientos.php: (por GET)
+A la consulta de movimientos ya existente, incorporar:
+f- El listado de todas las operaciones (depósitos y retiros) por usuario
+*/
 
 require_once 'cuenta.php';
 require_once 'deposito.php';
+require_once 'retiro.php';
 
 $accion = isset($_GET['ACTION']) ? $_GET['ACTION'] : '';
 
@@ -115,25 +122,77 @@ switch($accion){
             }else{
                 echo'<br>Error al buscar los depositos por moneda...';
             }
+        }else{
+            echo'<br>Parametros incorrectos...';
+        }
+        break;
+    case 'f':
+        if(isset($_GET["nroCuenta"])){
+            echo'<br>En un momento buscaremos sus operaciones, aguarde...';
+            $depositos = cargarDepositosDesdeJSON('depositos.json');
+            $retiros = cargarRetirosDesdeJSON('retiro.json');
+            $depositosEncontrados= Deposito::buscarDepositosNroCuenta($depositos, $_GET["nroCuenta"]);
+            if($depositosEncontrados){
+                if(Deposito::mostrarDepositos($depositosEncontrados)){
+                    echo'<br>Exito al mostrar los depositos por numero de cuenta...';
+                    $retirosEncontrados = Retiro::buscarRetirosNroCuenta($retiros, $_GET["nroCuenta"]);
+                    if($retirosEncontrados){
+                        if(Retiro::mostrarRetiros($retirosEncontrados)){
+                            echo'<br>Exito al mostrar los retiros por numero de cuenta...';
+                        }else{
+                            echo'<br>Error al mostrar los retiros por numero de cuenta...';
+                        }
+                    }else{
+                        echo'<br>Error al buscar los retiros por numero de cuenta...';
+                    }
+                }else{
+                    echo'<br>Error al mostrar los depositos por numero de cuenta...';
+                }
+            }else{
+                echo'<br>Error al buscar los depositos por numero de cuenta...';
+            }
+        }else{
+            echo'<br>Parametros incorrectos...';
         }
         break;
 }
 
 function cargarDepositosDesdeJSON($archivo){
-
-    // leo el contenido
     $contenidoJSON = file_get_contents($archivo);
+    $datos = json_decode($contenidoJSON, true);
 
-    // lo decodifico
-    $depositos = json_decode($contenidoJSON, false);
-
-    // confirmo que este cargado el array
-    if (is_array($depositos)) {
-        echo '<br>Decodificacion exitosa...';
-        return $depositos;
-    } else {
-        echo "<br>Error al decodificar el archivo JSON.";
+    $depositos = [];
+    foreach ($datos as $dato) {
+        $depositos[] = new Deposito(
+            $dato['id'],
+            $dato['tipoCuenta'],
+            $dato['nroCuenta'],
+            $dato['moneda'],
+            $dato['importe'],
+            $dato['fecha']
+        );
     }
+
+    return $depositos;
+}
+
+function cargarRetirosDesdeJSON($archivo){
+    $contenidoJSON = file_get_contents($archivo);
+    $datos = json_decode($contenidoJSON, true);
+
+    $retiros = [];
+    foreach ($datos as $dato) {
+        $retiros[] = new Retiro(
+            $dato['id'],
+            $dato['tipoCuenta'],
+            $dato['nroCuenta'],
+            $dato['moneda'],
+            $dato['importe'],
+            $dato['fecha']
+        );
+    }
+
+    return $retiros;
 }
 
 ?>
